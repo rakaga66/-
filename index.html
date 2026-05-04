@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول هوجاس</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f14;
+            --surface: #17171f;
+            --surface2: #1f1f2a;
+            --border: #2c2c3e;
+            --purple: #7c5cbf;
+            --purple-dim: rgba(124, 92, 191, 0.18);
+            --orange-dim: rgba(216, 90, 48, 0.15);
+            --blue-dim: rgba(58, 143, 212, 0.15);
+            --green-dim: rgba(46, 168, 122, 0.15);
+            --amber-dim: rgba(201, 138, 26, 0.15);
+            --red: #c0392b;
+            --text: #ededf5;
+            --text2: #9090aa;
+            --text3: #55556a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: linear-gradient(rgba(124, 92, 191, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 92, 191, 0.03) 1px, transparent 1px);
+            background-size: 36px 36px;
+            pointer-events: none;
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 28px 16px 80px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .header h1 span {
+            color: var(--purple);
+        }
+
+        .header p {
+            color: var(--text2);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 9px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text2);
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .tab.active {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: var(--surface2);
+            padding: 0;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        thead th:first-child {
+            min-width: 108px;
+        }
+
+        thead th.day-th {
+            min-width: 100px;
+        }
+
+        .day-head-inner {
+            padding: 10px 8px 8px;
+        }
+
+        .day-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text2);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ev-chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(216, 90, 48, 0.18);
+            border: 1px solid rgba(216, 90, 48, 0.3);
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 10px;
+            color: #f07858;
+        }
+
+        .ev-chip-name {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .ev-del {
+            background: none;
+            border: none;
+            color: rgba(240, 120, 88, 0.5);
+            cursor: pointer;
+            font-size: 11px;
+            padding: 0;
+        }
+
+        .ev-del:hover {
+            color: var(--red);
+        }
+
+        .add-ev-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: none;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 3px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 11px;
+            color: var(--text3);
+            cursor: pointer;
+            transition: all .2s;
+            margin-top: 4px;
+        }
+
+        .add-ev-btn:hover {
+            border-color: #d85a30;
+            color: #d85a30;
+        }
+
+        .time-th-inner {
+            padding: 10px 14px;
+            font-size: 11px;
+            color: var(--text3);
+            text-align: right;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .time-cell {
+            padding: 8px 14px 8px 6px;
+            font-size: 11px;
+            color: var(--text3);
+            white-space: nowrap;
+            vertical-align: middle;
+            border-left: 1px solid var(--border);
+        }
+
+        .data-cell {
+            padding: 4px 3px;
+            text-align: center;
+            border-left: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        /* SLOT */
+        .slot {
+            border-radius: 7px;
+            padding: 6px 6px;
+            min-height: 42px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            gap: 1px;
+            cursor: grab;
+            transition: transform .15s, box-shadow .15s, opacity .15s, filter .15s;
+            user-select: none;
+        }
+
+        .slot:active {
+            cursor: grabbing;
+        }
+
+        .slot:hover {
+            filter: brightness(1.12);
+        }
+
+        /* DONE */
+        .slot.done .slot-name {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .slot.done::after {
+            content: '✓';
+            position: absolute;
+            top: 3px;
+            left: 5px;
+            font-size: 10px;
+            color: #58c890;
+            font-weight: 900;
+        }
+
+        /* DRAG STATES */
+        .slot.dragging {
+            opacity: 0.35;
+            transform: scale(0.96);
+            cursor: grabbing;
+        }
+
+        .slot.drag-over {
+            box-shadow: 0 0 0 2px var(--purple);
+            filter: brightness(1.2);
+            transform: scale(1.04);
+        }
+
+        .slot-name {
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.3;
+            pointer-events: none;
+        }
+
+        .slot-sub {
+            font-size: 10px;
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        .drag-hint {
+            position: absolute;
+            top: 3px;
+            right: 4px;
+            font-size: 9px;
+            opacity: 0;
+            transition: opacity .2s;
+            pointer-events: none;
+        }
+
+        .slot:hover .drag-hint {
+            opacity: 0.4;
+        }
+
+        /* COLORS */
+        .c-qudrat {
+            background: var(--orange-dim);
+            color: #f07858;
+        }
+
+        .c-prog {
+            background: var(--purple-dim);
+            color: #b090f0;
+        }
+
+        .c-eng {
+            background: var(--green-dim);
+            color: #58c890;
+        }
+
+        .c-me {
+            background: var(--blue-dim);
+            color: #68b8f0;
+        }
+
+        .c-family {
+            background: var(--amber-dim);
+            color: #d4a840;
+        }
+
+        .c-school {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text2);
+        }
+
+        .c-sleep {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text3);
+        }
+
+        .c-off {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text3);
+            border: 1px dashed rgba(255, 255, 255, 0.07);
+        }
+
+        /* TOOLBAR */
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text2);
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .btn:hover {
+            border-color: var(--purple);
+            color: var(--text);
+        }
+
+        .btn.primary {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: #fff;
+        }
+
+        .btn.primary:hover {
+            background: #9070d8;
+        }
+
+        .drag-tip {
+            font-size: 11px;
+            color: var(--text3);
+            margin-right: auto;
+        }
+
+        /* LEGEND */
+        .legend {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .leg {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .leg-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        /* MODAL */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.75);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-bg.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            width: 330px;
+            max-width: 92vw;
+        }
+
+        .modal h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .modal label {
+            font-size: 12px;
+            color: var(--text2);
+            display: block;
+            margin-bottom: 4px;
+            margin-top: 12px;
+        }
+
+        .modal input {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border .2s;
+        }
+
+        .modal input:focus {
+            border-color: var(--purple);
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .modal-btns .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(60px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 13px;
+            color: var(--text2);
+            z-index: 200;
+            transition: transform .3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+            }
+
+            .toolbar,
+            .tabs,
+            .add-ev-btn,
+            .ev-del,
+            .drag-hint {
+                display: none !important;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="header">
+            <h1>جدول <span>هوجاس</span></h1>
+            <p>اسحب أي خانة وحطها مكان خانة ثانية — يتبادلون أماكنهم &nbsp;|&nbsp; كليك = إنجاز ✓</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('weekday',this)">أيام الدراسة</button>
+            <button class="tab" onclick="switchTab('weekend',this)">الويكند</button>
+        </div>
+
+        <div class="table-wrap">
+            <div style="overflow-x:auto">
+                <table>
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn primary" onclick="flashSave()">💾 حفظ</button>
+            <button class="btn" onclick="resetDone()">↺ مسح الإنجاز</button>
+            <button class="btn" onclick="undoSwap()">↩ تراجع</button>
+            <button class="btn" onclick="window.print()">🖨 طباعة</button>
+            <span class="drag-tip">⠿ اسحب الخانات لتبديل أماكنها</span>
+        </div>
+
+        <div class="legend">
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--orange-dim);border:1px solid #f07858"></div>قدرات
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--purple-dim);border:1px solid #b090f0"></div>برمجة
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--green-dim);border:1px solid #58c890"></div>إنجليزي
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--blue-dim);border:1px solid #68b8f0"></div>وقت خاص
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:var(--amber-dim);border:1px solid #d4a840"></div>عائلة
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:rgba(255,255,255,0.05);border:1px solid #444"></div>مدرسة
+            </div>
+            <div class="leg">
+                <div class="leg-dot" style="background:rgba(255,255,255,0.02);border:1px dashed #333"></div>استراحة
+            </div>
+        </div>
+    </div>
+
+    <!-- EVENT MODAL -->
+    <div class="modal-bg" id="evModal">
+        <div class="modal">
+            <h3 id="evModalTitle">إضافة حدث</h3>
+            <label>اسم الحدث</label>
+            <input id="evName" type="text" placeholder="مثال: اختبار رياضيات">
+            <label>الوقت (اختياري)</label>
+            <input id="evTime" type="text" placeholder="مثال: ٨ص">
+            <div class="modal-btns">
+                <button class="btn primary" onclick="saveEvent()">إضافة</button>
+                <button class="btn" onclick="closeModal('evModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── DEFAULT DATA ──────────────────────────────────────────────
+        const DEFAULTS = {
+            weekday: {
+                days: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'],
+                rows: [
+                    { time: '٧ص – ٢م', slots: [{ n: 'مدرسة', s: '', c: 'c-school' }, { n: 'مدرسة', s: '', c: 'c-school' }, { n: 'مدرسة', s: '', c: 'c-school' }, { n: 'مدرسة', s: '', c: 'c-school' }, { n: 'مدرسة', s: '', c: 'c-school' }] },
+                    { time: '٢م – ٣م', slots: [{ n: 'أكل + راحة', s: '', c: 'c-school' }, { n: 'أكل + راحة', s: '', c: 'c-school' }, { n: 'أكل + راحة', s: '', c: 'c-school' }, { n: 'أكل + راحة', s: '', c: 'c-school' }, { n: 'أكل + راحة', s: '', c: 'c-school' }] },
+                    { time: '٣م – ٥:٣٠م', slots: [{ n: 'نوم القيلولة', s: '', c: 'c-sleep' }, { n: 'نوم القيلولة', s: '', c: 'c-sleep' }, { n: 'نوم القيلولة', s: '', c: 'c-sleep' }, { n: 'نوم القيلولة', s: '', c: 'c-sleep' }, { n: 'نوم القيلولة', s: '', c: 'c-sleep' }] },
+                    { time: '٥:٣٠م – ٦م', slots: [{ n: 'صلاة + تجهز', s: '', c: 'c-school' }, { n: 'صلاة + تجهز', s: '', c: 'c-school' }, { n: 'صلاة + تجهز', s: '', c: 'c-school' }, { n: 'صلاة + تجهز', s: '', c: 'c-school' }, { n: 'صلاة + تجهز', s: '', c: 'c-school' }] },
+                    { time: '٦م – ٧م', slots: [{ n: 'وقتك الخاص', s: '', c: 'c-me' }, { n: 'وقتك الخاص', s: '', c: 'c-me' }, { n: 'وقتك الخاص', s: '', c: 'c-me' }, { n: 'وقتك الخاص', s: '', c: 'c-me' }, { n: 'وقتك الخاص', s: '', c: 'c-me' }] },
+                    { time: '٧م – ٨م', slots: [{ n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }] },
+                    { time: '٨م – ٨:١٥م', slots: [{ n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }] },
+                    { time: '٨:١٥م – ٩:١٥م', slots: [{ n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعة', c: 'c-qudrat' }] },
+                    { time: '٩:١٥م – ٩:٣٠م', slots: [{ n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }] },
+                    { time: '٩:٣٠م – ١٠:٣٠م', slots: [{ n: 'قدرات — لفظي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — لفظي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — لفظي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — لفظي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — لفظي', s: 'ساعة', c: 'c-qudrat' }] },
+                    { time: '١٠:٣٠م – ١١م', slots: [{ n: 'واجبات', s: 'مدرسة', c: 'c-school' }, { n: 'واجبات', s: 'مدرسة', c: 'c-school' }, { n: 'واجبات', s: 'مدرسة', c: 'c-school' }, { n: 'واجبات', s: 'مدرسة', c: 'c-school' }, { n: 'واجبات', s: 'مدرسة', c: 'c-school' }] },
+                    { time: '١١م – ١١:٣٠م', slots: [{ n: 'برمجة', s: 'هوجاس', c: 'c-prog' }, { n: 'برمجة', s: 'هوجاس', c: 'c-prog' }, { n: 'برمجة', s: 'هوجاس', c: 'c-prog' }, { n: 'برمجة', s: 'هوجاس', c: 'c-prog' }, { n: 'برمجة', s: 'هوجاس', c: 'c-prog' }] },
+                    { time: '١١:٣٠م', slots: [{ n: 'نوم', s: '', c: 'c-sleep' }, { n: 'نوم', s: '', c: 'c-sleep' }, { n: 'نوم', s: '', c: 'c-sleep' }, { n: 'نوم', s: '', c: 'c-sleep' }, { n: 'نوم', s: '', c: 'c-sleep' }] },
+                ]
+            },
+            weekend: {
+                days: ['الخميس', 'الجمعة'],
+                rows: [
+                    { time: '٢م – ٤م', slots: [{ n: 'قدرات — كمي', s: 'ساعتين', c: 'c-qudrat' }, { n: 'قدرات — كمي', s: 'ساعتين', c: 'c-qudrat' }] },
+                    { time: '٤م – ٤:١٥م', slots: [{ n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }] },
+                    { time: '٤:١٥م – ٥:١٥م', slots: [{ n: 'قدرات — لفظي', s: 'ساعة', c: 'c-qudrat' }, { n: 'قدرات — لفظي', s: 'ساعة', c: 'c-qudrat' }] },
+                    { time: '٥:١٥م – ٥:٣٠م', slots: [{ n: 'استراحة', s: '', c: 'c-off' }, { n: 'استراحة', s: '', c: 'c-off' }] },
+                    { time: '٥:٣٠م – ٧م', slots: [{ n: 'برمجة', s: 'هوجاس', c: 'c-prog' }, { n: 'برمجة', s: 'هوجاس', c: 'c-prog' }] },
+                    { time: '٧م – ٨م', slots: [{ n: 'إنجليزي', s: '', c: 'c-eng' }, { n: 'إنجليزي', s: '', c: 'c-eng' }] },
+                    { time: '٨م – ١١:٣٠م', slots: [{ n: 'عائلة / حر', s: '', c: 'c-family' }, { n: 'عائلة / حر', s: '', c: 'c-family' }] },
+                    { time: '١١:٣٠م', slots: [{ n: 'نوم', s: '', c: 'c-sleep' }, { n: 'نوم', s: '', c: 'c-sleep' }] },
+                ]
+            }
+        };
+
+        // ── STATE ─────────────────────────────────────────────────────
+        let currentTab = 'weekday';
+        let dragSrc = null; // {ri, ci}
+        let lastSwap = null; // for undo
+        let pendingEventCol = null;
+        let schedules, done, dayEvents;
+
+        function loadState() {
+            try { schedules = JSON.parse(localStorage.getItem('hj_schedules')) || JSON.parse(JSON.stringify(DEFAULTS)); } catch (e) { schedules = JSON.parse(JSON.stringify(DEFAULTS)); }
+            try { done = JSON.parse(localStorage.getItem('hj_done')) || {}; } catch (e) { done = {}; }
+            try { dayEvents = JSON.parse(localStorage.getItem('hj_devents')) || {}; } catch (e) { dayEvents = {}; }
+        }
+        function saveState() {
+            localStorage.setItem('hj_schedules', JSON.stringify(schedules));
+            localStorage.setItem('hj_done', JSON.stringify(done));
+            localStorage.setItem('hj_devents', JSON.stringify(dayEvents));
+        }
+
+        // ── RENDER ────────────────────────────────────────────────────
+        function render() {
+            const sch = schedules[currentTab];
+            const days = sch.days;
+
+            // HEAD
+            let h = '<tr><th><div class="time-th-inner">الوقت</div></th>';
+            days.forEach((day, ci) => {
+                const key = `${currentTab}_${ci}`;
+                const evs = dayEvents[key] || [];
+                let evHtml = evs.map((ev, ei) =>
+                    `<div class="ev-chip">
+        <span class="ev-chip-name">${ev.name}${ev.time ? ' · ' + ev.time : ''}</span>
+        <button class="ev-del" onclick="deleteEvent('${key}',${ei})">✕</button>
+      </div>`
+                ).join('');
+                h += `<th class="day-th"><div class="day-head-inner">
+      <div class="day-name">${day}</div>
+      <div class="day-events">${evHtml}</div>
+      <button class="add-ev-btn" onclick="openEvModal(${ci})">＋ حدث</button>
+    </div></th>`;
+            });
+            document.getElementById('tableHead').innerHTML = h + '</tr>';
+
+            // BODY
+            let b = '';
+            sch.rows.forEach((row, ri) => {
+                b += `<tr><td class="time-cell">${row.time}</td>`;
+                days.forEach((_, ci) => {
+                    const slot = row.slots[ci] || { n: '—', s: '', c: 'c-off' };
+                    const doneKey = `${currentTab}_${ri}_${ci}`;
+                    const isDone = !!done[doneKey];
+                    b += `<td class="data-cell">
+        <div class="slot ${slot.c}${isDone ? ' done' : ''}"
+          draggable="true"
+          data-ri="${ri}" data-ci="${ci}"
+          onclick="handleClick(event,${ri},${ci})"
+          title="اسحب للتبديل | كليك: إنجاز">
+          <span class="drag-hint">⠿</span>
+          <span class="slot-name">${slot.n}</span>
+          ${slot.s ? `<span class="slot-sub">${slot.s}</span>` : ''}
+        </div>
+      </td>`;
+                });
+                b += '</tr>';
+            });
+            document.getElementById('tableBody').innerHTML = b;
+
+            // Attach drag events
+            document.querySelectorAll('.slot[draggable]').forEach(el => {
+                el.addEventListener('dragstart', onDragStart);
+                el.addEventListener('dragover', onDragOver);
+                el.addEventListener('dragleave', onDragLeave);
+                el.addEventListener('drop', onDrop);
+                el.addEventListener('dragend', onDragEnd);
+            });
+        }
+
+        // ── DRAG & DROP ───────────────────────────────────────────────
+        let dragStartTime = 0;
+
+        function onDragStart(e) {
+            dragStartTime = Date.now();
+            const el = e.currentTarget;
+            dragSrc = { ri: +el.dataset.ri, ci: +el.dataset.ci };
+            el.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', `${dragSrc.ri},${dragSrc.ci}`);
+        }
+
+        function onDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const el = e.currentTarget;
+            const ri = +el.dataset.ri, ci = +el.dataset.ci;
+            if (!dragSrc || (ri === dragSrc.ri && ci === dragSrc.ci)) return;
+            el.classList.add('drag-over');
+        }
+
+        function onDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function onDrop(e) {
+            e.preventDefault();
+            const el = e.currentTarget;
+            const tgtRi = +el.dataset.ri, tgtCi = +el.dataset.ci;
+            if (!dragSrc || (tgtRi === dragSrc.ri && tgtCi === dragSrc.ci)) return;
+            el.classList.remove('drag-over');
+            swapSlots(dragSrc.ri, dragSrc.ci, tgtRi, tgtCi);
+        }
+
+        function onDragEnd(e) {
+            e.currentTarget.classList.remove('dragging');
+            document.querySelectorAll('.slot.drag-over').forEach(el => el.classList.remove('drag-over'));
+            dragSrc = null;
+        }
+
+        function swapSlots(r1, c1, r2, c2) {
+            const rows = schedules[currentTab].rows;
+            // Save for undo
+            lastSwap = {
+                r1, c1, r2, c2,
+                s1: { ...rows[r1].slots[c1] },
+                s2: { ...rows[r2].slots[c2] }
+            };
+            // Swap
+            const tmp = { ...rows[r1].slots[c1] };
+            rows[r1].slots[c1] = { ...rows[r2].slots[c2] };
+            rows[r2].slots[c2] = tmp;
+            saveState();
+            render();
+            showToast('تم التبديل ✓  — اضغط "تراجع" للرجوع');
+        }
+
+        function undoSwap() {
+            if (!lastSwap) return;
+            const { r1, c1, r2, c2, s1, s2 } = lastSwap;
+            schedules[currentTab].rows[r1].slots[c1] = s1;
+            schedules[currentTab].rows[r2].slots[c2] = s2;
+            lastSwap = null;
+            saveState(); render();
+            showToast('تم التراجع');
+        }
+
+        // ── CLICK = DONE ──────────────────────────────────────────────
+        function handleClick(e, ri, ci) {
+            // Only register as click if didn't drag
+            if (Date.now() - dragStartTime < 300) return;
+            const key = `${currentTab}_${ri}_${ci}`;
+            done[key] = !done[key];
+            saveState(); render();
+        }
+
+        function resetDone() {
+            Object.keys(done).filter(k => k.startsWith(currentTab + '_')).forEach(k => delete done[k]);
+            saveState(); render();
+        }
+
+        // ── EVENTS ────────────────────────────────────────────────────
+        function openEvModal(ci) {
+            pendingEventCol = ci;
+            const day = schedules[currentTab].days[ci];
+            document.getElementById('evModalTitle').textContent = `حدث ليوم ${day}`;
+            document.getElementById('evName').value = '';
+            document.getElementById('evTime').value = '';
+            document.getElementById('evModal').classList.add('open');
+            setTimeout(() => document.getElementById('evName').focus(), 100);
+        }
+        function saveEvent() {
+            const name = document.getElementById('evName').value.trim();
+            if (!name) return;
+            const time = document.getElementById('evTime').value.trim();
+            const key = `${currentTab}_${pendingEventCol}`;
+            if (!dayEvents[key]) dayEvents[key] = [];
+            dayEvents[key].push({ name, time });
+            saveState(); render(); closeModal('evModal');
+        }
+        function deleteEvent(key, ei) {
+            dayEvents[key].splice(ei, 1);
+            if (!dayEvents[key].length) delete dayEvents[key];
+            saveState(); render();
+        }
+
+        // ── UTILS ─────────────────────────────────────────────────────
+        function switchTab(tab, btn) {
+            currentTab = tab;
+            lastSwap = null;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            render();
+        }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        function flashSave() {
+            saveState();
+            const b = document.querySelector('.btn.primary');
+            const orig = b.textContent; b.textContent = '✓ محفوظ';
+            setTimeout(() => b.textContent = orig, 1400);
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
+            if (e.key === 'Enter' && document.getElementById('evModal').classList.contains('open')) saveEvent();
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') undoSwap();
+        });
+        document.querySelectorAll('.modal-bg').forEach(bg =>
+            bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); })
+        );
+
+        loadState();
+        render();
+    </script>
+</body>
+
+</html>
